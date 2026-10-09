@@ -58,8 +58,8 @@ public class AllureListener implements ITestListener {
     public void onStart(ITestContext context) {
         if (config.getBooleanProperty("allure.enabled", true)) {
             Allure.parameter("Suite Name", context.getName());
-            Allure.parameter("Parallel", String.valueOf(context.getParallel()));
-            Allure.parameter("Thread Count", String.valueOf(context.getThreadCount()));
+            Allure.parameter("Parallel", String.valueOf(context.getSuite().getParallel()));
+            Allure.parameter("Thread Count", String.valueOf(context.getSuite().getXmlSuite().getThreadCount()));
         }
     }
 

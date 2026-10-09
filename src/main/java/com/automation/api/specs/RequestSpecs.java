@@ -2,6 +2,8 @@ package com.automation.api.specs;
 
 import com.automation.config.ConfigManager;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -21,9 +23,10 @@ public class RequestSpecs {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addHeader("User-Agent", "Java-REST-ATF/1.0")
-                .setConnectTimeout(config.getIntProperty("connection.timeout", 10000))
-                .setSocketTimeout(config.getIntProperty("socket.timeout", 10000));
-
+                .setConfig(RestAssuredConfig.config()
+                        .httpClient(HttpClientConfig.httpClientConfig()
+                                .setParam("http.connection.timeout", config.getIntProperty("connection.timeout", 10000))
+                                .setParam("http.socket.timeout", config.getIntProperty("socket.timeout", 10000))));
         if (config.getBooleanProperty("log.request", true)) {
             builder.addFilter(new RequestLoggingFilter(LogDetail.ALL));
         }
@@ -42,24 +45,27 @@ public class RequestSpecs {
     }
 
     public static RequestSpecification multipartSpec() {
-        return new RequestSpecBuilder()
+        RequestSpecBuilder builder = new RequestSpecBuilder()
                 .setBaseUri(config.getBaseUrl())
                 .setAccept(ContentType.JSON)
                 .addHeader("User-Agent", "Java-REST-ATF/1.0")
-                .setConnectTimeout(config.getIntProperty("connection.timeout", 10000))
-                .setSocketTimeout(config.getIntProperty("socket.timeout", 10000))
-                .addFilter(new AllureRestAssured())
-                .build();
+                .setConfig(RestAssuredConfig.config()
+                        .httpClient(HttpClientConfig.httpClientConfig()
+                                .setParam("http.connection.timeout", config.getIntProperty("connection.timeout", 10000))
+                                .setParam("http.socket.timeout", config.getIntProperty("socket.timeout", 10000))));
+        return builder.addFilter(new AllureRestAssured()).build();
     }
 
     public static RequestSpecification noLogSpec() {
-        return new RequestSpecBuilder()
+        RequestSpecBuilder builder = new RequestSpecBuilder()
                 .setBaseUri(config.getBaseUrl())
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addHeader("User-Agent", "Java-REST-ATF/1.0")
-                .setConnectTimeout(config.getIntProperty("connection.timeout", 10000))
-                .setSocketTimeout(config.getIntProperty("socket.timeout", 10000))
-                .build();
+                .setConfig(RestAssuredConfig.config()
+                        .httpClient(HttpClientConfig.httpClientConfig()
+                                .setParam("http.connection.timeout", config.getIntProperty("connection.timeout", 10000))
+                                .setParam("http.socket.timeout", config.getIntProperty("socket.timeout", 10000))));
+        return builder.build();
     }
 }

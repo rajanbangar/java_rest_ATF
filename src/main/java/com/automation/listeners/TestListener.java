@@ -50,8 +50,8 @@ public class TestListener implements ITestListener {
     @Override
     public void onStart(ITestContext context) {
         logger.info("=== TEST SUITE STARTED: {} ===", context.getName());
-        logger.info("Parallel mode: {}", context.getParallel());
-        logger.info("Thread count: {}", context.getThreadCount());
+        logger.info("Parallel mode: {}", context.getSuite().getParallel());
+        logger.info("Thread count: {}", context.getSuite().getXmlSuite().getThreadCount());
     }
 
     @Override

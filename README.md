@@ -1,24 +1,21 @@
 # Java REST API Test Automation Framework
 
-A full-fledged TestNG + RestAssured framework for automating reqres.in APIs.
+A TestNG + RestAssured framework for automating JSONPlaceholder APIs.
 
 ## Features
 
 - RestAssured 5.4.0
 - TestNG 7.9.0
 - Jackson
-- Lombok
 - Allure Reports
 - ExtentReports
-- AssertJ
-- Java Faker
-- JSON Schema Validation
 - SLF4J + Logback
 - Maven Profiles
+
 ## Quick Start
 
 ```bash
-# Run all tests
+# Run the JSONPlaceholder suite
 mvn clean test
 
 # Run with specific environment
@@ -27,8 +24,8 @@ mvn clean test -Denvironment=prod
 # Run specific group
 mvn clean test -Dgroups=smoke
 
-# Run specific test class
-mvn clean test -Dtest=GetUsersTest
+# Run the JSONPlaceholder post tests
+mvn clean test -Dtest=JsonPlaceholderPostsTest
 
 # Generate Allure report
 mvn allure:serve
@@ -60,16 +57,8 @@ java_rest_ATF/
 │   │   └── resources/
 │   │       ├── config.properties
 │   │       └── logback.xml
-│   └── test/
-│       ├── java/com/automation/
-│       │   ├── base/
-│       │   ├── data/
-│       │   └── tests/
-│       │       ├── auth/
-│       │       ├── resources/
-│       │       └── users/
-│       └── resources/
-│           └── schemas/
+│   └── test/java/com/automation/tests/jsonplaceholder/
+│       └── JsonPlaceholderPostsTest.java
 ```
 
 ### Core Components
@@ -84,45 +73,29 @@ java_rest_ATF/
 - **Singleton pattern** - centralized HTTP client
 - Configures RestAssured with base URI, headers, timeouts, logging filters, Allure filter
 - Provides fluent methods: get(), post(), put(), patch(), delete()
-- Authentication token management: setAuthToken(), removeAuthToken()
+
 #### 3. Request/Response Specifications (RequestSpecs.java, ResponseSpecs.java)
 - **Reusable specifications** for different scenarios
 - defaultSpec(), authSpec(token), multipartSpec(), noLogSpec()
 - Response specs: successSpec(), createdSpec(), noContentSpec(), badRequestSpec(), unauthorizedSpec(), notFoundSpec(), serverErrorSpec()
 
-#### 4. Endpoint Classes (UserEndpoints.java, AuthEndpoints.java, ResourceEndpoints.java)
+#### 4. JSONPlaceholder Posts Endpoint
 - **Page Object / Endpoint Object pattern**
-- Each class handles one resource (Users, Auth, Resources)
-- Provides both raw Response and typed POJO methods
-- Uses ApiClient internally for HTTP calls
+- Handles JSONPlaceholder posts through the shared API client
+- Covers GET, POST, PUT, PATCH, and DELETE operations
 
-#### 5. Model Classes (POJOs with Lombok)
-- User, UserListResponse, AuthRequest, AuthResponse, Resource, ResourceListResponse
-- Lombok: @Data, @Builder, @AllArgsConstructor, @NoArgsConstructor
-- Jackson annotations for JSON serialization/deserialization
-
-#### 6. Base Test Class (BaseTest.java)
-- **Template Method pattern** for test setup/teardown
-- @BeforeSuite - Initialize config, API client, endpoints
-- @BeforeMethod - Reset RestAssured for clean state per test
-- @AfterSuite - Cleanup
-- Helper methods: setAuthToken(), clearAuthToken()
-
-#### 7. TestNG Listeners
+#### 5. TestNG Listeners
 - **TestListener** - Logs test start/pass/fail/skip with duration
 - **AllureListener** - Enhances Allure reports with parameters, steps, attachments
 - **ExtentReportListener** - Generates ExtentReports HTML reports
 
-#### 8. Utilities
+#### 6. Utilities
 - **JsonUtils** - JSON serialization/deserialization helpers
-- **SchemaValidator** - JSON Schema validation against .json files
-- **TestDataFactory** - Generates dynamic test data using Java Faker
 
 ### Configuration (config.properties)
 
 ```properties
-base.url=https://reqres.in
-api.base.path=/api
+base.url=https://jsonplaceholder.typicode.com
 connection.timeout=10000
 socket.timeout=10000
 retry.count=3
@@ -138,11 +111,8 @@ environment=qa
 ### Test Organization (testng.xml)
 
 - **Parallel execution**: parallel="methods" with thread-count="3"
-- **Groups**: smoke, regression, users, auth, resources
-- **Three test suites**:
-  1. **User API Tests** - com.automation.tests.users
-  2. **Auth API Tests** - com.automation.tests.auth
-  3. **Resource API Tests** - com.automation.tests.resources
+- **Groups**: smoke, regression, jsonplaceholder
+- **JSONPlaceholder API Tests** - CRUD coverage for posts and retrieval of a todo
 - **Listeners**: TestListener, AllureListener, ExtentReportListener
 
 ### Reporting & Logging
@@ -161,63 +131,30 @@ Log files location: target/logs/application.log and target/logs/test-execution.l
 | Pattern | Where Applied |
 |---------|---------------|
 | **Singleton** | ConfigManager, ApiClient |
-| **Builder** | RequestSpecBuilder, ResponseSpecBuilder, Lombok @Builder |
-| **Page Object / Endpoint Object** | UserEndpoints, AuthEndpoints, ResourceEndpoints |
-| **Template Method** | BaseTest (@BeforeSuite, @BeforeMethod, etc.)
+| **Builder** | RequestSpecBuilder, ResponseSpecBuilder |
+| **Page Object / Endpoint Object** | JsonPlaceholderEndpoints |
 | **Strategy** | RequestSpecs (different specs for different scenarios)
-| **Factory** | TestDataFactory (dynamic test data generation)
 | **Observer/Listener** | TestNG ITestListener implementations
 ## Dependencies (pom.xml highlights)
 
 | Category | Libraries |
 |----------|-----------|
-| **API Testing** | RestAssured 5.4.0, JSON Schema Validator |
+| **API Testing** | RestAssured 5.4.0 |
 | **Test Framework** | TestNG 7.9.0 |
 | **JSON Processing** | Jackson 2.16.1 (databind, annotations, jsr310) |
-| **Boilerplate Reduction** | Lombok 1.18.30 |
 | **Logging** | SLF4J 2.0.9 + Logback 1.4.11 |
 | **Reporting** | Allure 2.24.0, ExtentReports 5.1.1 |
-| **Assertions** | AssertJ 3.24.2, Hamcrest |
-| **Test Data** | Java Faker 1.0.2 |
-
-## Example Test Flow
-
-```java
-// Test extends BaseTest -> gets configured endpoints automatically
-public class GetUsersTest extends BaseTest {
-
-    @Test(groups = {"smoke", "regression", "users"})
-    public void testGetUsersDefaultPage() {
-        // Uses endpoint wrapper (clean, readable)
-        Response response = userEndpoints.getUsers();
-
-        // Hamcrest/AssertJ assertions with ResponseSpecs
-        response.then()
-                .spec(ResponseSpecs.successSpec())  // Reusable validation
-                .body("page", equalTo(1))
-                .body("data.size()", equalTo(6));
-    }
-
-    @Test(groups = {"regression", "users"})
-    public void testGetUsersAsObject() {
-        // Typed response using POJOs
-        UserListResponse userList = userEndpoints.getUsersAsObject();
-        Assert.assertEquals(userList.getPage(), 1);
-        User firstUser = userList.getData().get(0);
-        Assert.assertTrue(firstUser.getEmail().contains("@"));
-    }
-}
-```
+| **Assertions** | Hamcrest |
+| **API** | JSONPlaceholder posts endpoint |
 
 ## Framework Strengths
 
 1. **Maintainable** - Clear separation of concerns (config, client, endpoints, models, tests)
 2. **Scalable** - Easy to add new endpoints, models, test suites
-3. **Reusable** - Request/Response specs, endpoint wrappers, typed responses
+3. **Reusable** - Request/Response specs and endpoint wrappers
 4. **Configurable** - Environment-specific configs, system property overrides
 5. **Observable** - Comprehensive logging, Allure + ExtentReports
 6. **Parallel-ready** - Thread-safe singletons, TestNG parallel execution
-7. **Type-safe** - POJOs with Jackson/Lombok, compile-time safety
-8. **Schema Validation** - Contract testing with JSON Schema
+7. **API Coverage** - GET, POST, PUT, PATCH, and DELETE posts
 
-This framework follows **industry best practices** for REST API automation and can be easily extended for any REST API, not just reqres.in.
+This framework follows **industry best practices** for REST API automation and can be extended to cover additional APIs.

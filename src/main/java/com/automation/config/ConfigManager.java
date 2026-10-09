@@ -55,11 +55,12 @@ public class ConfigManager {
     }
 
     public String getProperty(String key) {
-        return properties.getProperty(key);
+        return System.getProperty(key, properties.getProperty(key));
     }
 
     public String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        String value = getProperty(key);
+        return value == null ? defaultValue : value;
     }
 
     public int getIntProperty(String key, int defaultValue) {
@@ -84,7 +85,7 @@ public class ConfigManager {
     }
 
     public String getBaseUrl() {
-        return getProperty("base.url", "https://reqres.in") + getProperty("api.base.path", "/api");
+        return getProperty("base.url", "https://jsonplaceholder.typicode.com");
     }
 
     public void reload() {
