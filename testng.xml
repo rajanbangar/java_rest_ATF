@@ -7,45 +7,16 @@
         <listener class-name="com.automation.listeners.ExtentReportListener"/>
     </listeners>
 
-    <parameter name="config.file" value="config.properties"/>
-    <parameter name="environment" value="qa"/>
-
-    <test name="User API Tests">
+    <test name="JSONPlaceholder API Tests">
         <groups>
             <run>
                 <include name="smoke"/>
                 <include name="regression"/>
-                <include name="users"/>
+                <include name="jsonplaceholder"/>
             </run>
         </groups>
         <packages>
-            <package name="com.automation.tests.users"/>
-        </packages>
-    </test>
-
-    <test name="Auth API Tests">
-        <groups>
-            <run>
-                <include name="smoke"/>
-                <include name="regression"/>
-                <include name="auth"/>
-            </run>
-        </groups>
-        <packages>
-            <package name="com.automation.tests.auth"/>
-        </packages>
-    </test>
-
-    <test name="Resource API Tests">
-        <groups>
-            <run>
-                <include name="smoke"/>
-                <include name="regression"/>
-                <include name="resources"/>
-            </run>
-        </groups>
-        <packages>
-            <package name="com.automation.tests.resources"/>
+            <package name="com.automation.tests.jsonplaceholder"/>
         </packages>
     </test>
 </suite>

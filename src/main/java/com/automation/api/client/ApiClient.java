@@ -4,6 +4,8 @@ import com.automation.config.ConfigManager;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -24,7 +26,7 @@ import static io.restassured.RestAssured.given;
 public class ApiClient {
     private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
     private static ApiClient instance;
-    private final RequestSpecification requestSpec;
+    private RequestSpecification requestSpec;
     private final ConfigManager config;
 
     private ApiClient() {
@@ -51,9 +53,10 @@ public class ApiClient {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addHeader("User-Agent", "Java-REST-ATF/1.0")
-                .setConnectTimeout(config.getIntProperty("connection.timeout", 10000))
-                .setSocketTimeout(config.getIntProperty("socket.timeout", 10000));
-
+                .setConfig(RestAssuredConfig.config()
+                        .httpClient(HttpClientConfig.httpClientConfig()
+                                .setParam("http.connection.timeout", config.getIntProperty("connection.timeout", 10000))
+                                .setParam("http.socket.timeout", config.getIntProperty("socket.timeout", 10000))));
         // Add request/response logging filters if enabled
         if (config.getBooleanProperty("log.request", true)) {
             builder.addFilter(new RequestLoggingFilter(LogDetail.ALL));
@@ -115,11 +118,11 @@ public class ApiClient {
     }
 
     public void setAuthToken(String token) {
-        requestSpec.header("Authorization", "Bearer " + token);
+        requestSpec = requestSpec.header("Authorization", "Bearer " + token);
     }
 
     public void removeAuthToken() {
-        requestSpec.removeHeader("Authorization");
+        requestSpec = requestSpec.header("Authorization", "");
     }
 
     public static void reset() {
