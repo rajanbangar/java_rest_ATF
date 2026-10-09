@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="REST API Automation Suite" verbose="1" parallel="methods" thread-count="3">
+    <listeners>
+        <listener class-name="com.automation.listeners.TestListener"/>
+        <listener class-name="com.automation.listeners.AllureListener"/>
+        <listener class-name="com.automation.listeners.ExtentReportListener"/>
+    </listeners>
+
+    <parameter name="config.file" value="config.properties"/>
+    <parameter name="environment" value="qa"/>
+
+    <test name="User API Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="regression"/>
+                <include name="users"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.automation.tests.users"/>
+        </packages>
+    </test>
+
+    <test name="Auth API Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="regression"/>
+                <include name="auth"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.automation.tests.auth"/>
+        </packages>
+    </test>
+
+    <test name="Resource API Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="regression"/>
+                <include name="resources"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.automation.tests.resources"/>
+        </packages>
+    </test>
+</suite>
