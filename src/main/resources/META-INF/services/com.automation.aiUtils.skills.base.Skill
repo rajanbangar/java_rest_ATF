@@ -1,0 +1,3 @@
+com.automation.aiUtils.skills.bestpractices.BestPracticesSkill
+com.automation.aiUtils.skills.failureAnalysis.AIFailureAnalysisSkill
+com.automation.aiUtils.skills.guardrails.SensitiveDataGuardrailsSkill

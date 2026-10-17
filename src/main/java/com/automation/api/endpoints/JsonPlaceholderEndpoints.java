@@ -11,6 +11,7 @@ import java.util.Map;
 public class JsonPlaceholderEndpoints {
     private static final String POSTS_PATH = "/posts";
     private static final String TODOS_PATH = "/todos";
+    private static final String USERS_PATH = "/users";
     private final ApiClient apiClient = ApiClient.getInstance();
 
     public Response getPosts() {
@@ -39,5 +40,9 @@ public class JsonPlaceholderEndpoints {
 
     public Response getTodo(int todoId) {
         return apiClient.get(TODOS_PATH + "/" + todoId);
+    }
+
+    public Response getUser(int userId) {
+        return apiClient.get(USERS_PATH + "/" + userId);
     }
 }

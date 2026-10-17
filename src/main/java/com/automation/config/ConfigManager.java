@@ -84,6 +84,19 @@ public class ConfigManager {
         return Boolean.parseBoolean(value);
     }
 
+    public double getDoubleProperty(String key, double defaultValue) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid double value for key {}: {}", key, value);
+            return defaultValue;
+        }
+    }
+
     public String getBaseUrl() {
         return getProperty("base.url", "https://jsonplaceholder.typicode.com");
     }

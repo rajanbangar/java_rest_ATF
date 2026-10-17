@@ -8,15 +8,20 @@
     </listeners>
 
     <test name="JSONPlaceholder API Tests">
-        <groups>
+        <!--<groups>
             <run>
                 <include name="smoke"/>
                 <include name="regression"/>
                 <include name="jsonplaceholder"/>
             </run>
-        </groups>
-        <packages>
+        </groups>-->
+        <classes>
+            <!-- Replace with your exact package and class name -->
+            <class name="com.automation.tests.jsonplaceholder.JsonPlaceholderUsersTest" />
+            <class name="com.automation.tests.jsonplaceholder.JsonPlaceholderPostsTest" />
+        </classes>
+        <!--<packages>
             <package name="com.automation.tests.jsonplaceholder"/>
-        </packages>
+        </packages>-->
     </test>
 </suite>

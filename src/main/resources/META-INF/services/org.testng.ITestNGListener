@@ -1,0 +1,3 @@
+com.automation.aiUtils.hooks.AIFailureAnalysisHook
+com.automation.aiUtils.hooks.BestPracticesHook
+com.automation.aiUtils.hooks.GuardrailsHook

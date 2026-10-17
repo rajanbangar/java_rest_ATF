@@ -1,0 +1,80 @@
+{
+  "posts": [
+    {
+      "testName": "getPosts",
+      "description": "Retrieve the posts collection from JSONPlaceholder",
+      "endpoint": "GET /posts",
+      "expectedStatusCode": 200,
+      "validations": [
+        { "field": "size()", "operator": "greaterThan", "value": 0 },
+        { "field": "[0].id", "operator": "notNull", "value": null },
+        { "field": "[0].title", "operator": "notNull", "value": null }
+      ],
+      "groups": ["smoke", "regression", "jsonplaceholder"]
+    },
+    {
+      "testName": "getPostById",
+      "description": "Retrieve a post by its identifier",
+      "endpoint": "GET /posts/{id}",
+      "pathParams": { "id": 1 },
+      "expectedStatusCode": 200,
+      "validations": [
+        { "field": "id", "operator": "equalTo", "value": 1 },
+        { "field": "userId", "operator": "equalTo", "value": 1 },
+        { "field": "title", "operator": "notNull", "value": null },
+        { "field": "body", "operator": "notNull", "value": null }
+      ],
+      "groups": ["smoke", "regression", "jsonplaceholder"]
+    },
+    {
+      "testName": "createPost",
+      "description": "Create a post and verify the returned representation",
+      "endpoint": "POST /posts",
+      "requestBody": { "userId": 1, "title": "Automated API test", "body": "Created by the Java REST automation framework" },
+      "expectedStatusCode": 201,
+      "validations": [
+        { "field": "id", "operator": "notNull", "value": null },
+        { "field": "userId", "operator": "equalTo", "value": 1 },
+        { "field": "title", "operator": "equalTo", "value": "Automated API test" },
+        { "field": "body", "operator": "equalTo", "value": "Created by the Java REST automation framework" }
+      ],
+      "groups": ["regression", "jsonplaceholder"]
+    },
+    {
+      "testName": "replacePost",
+      "description": "Replace a post and verify the returned representation",
+      "endpoint": "PUT /posts/{id}",
+      "pathParams": { "id": 1 },
+      "requestBody": { "id": 1, "userId": 1, "title": "Replaced title", "body": "Replaced body" },
+      "expectedStatusCode": 200,
+      "validations": [
+        { "field": "id", "operator": "equalTo", "value": 1 },
+        { "field": "title", "operator": "equalTo", "value": "Replaced title" },
+        { "field": "body", "operator": "equalTo", "value": "Replaced body" }
+      ],
+      "groups": ["regression", "jsonplaceholder"]
+    },
+    {
+      "testName": "patchPost",
+      "description": "Partially update a post and verify the changed field",
+      "endpoint": "PATCH /posts/{id}",
+      "pathParams": { "id": 1 },
+      "requestBody": { "title": "Patched title" },
+      "expectedStatusCode": 200,
+      "validations": [
+        { "field": "id", "operator": "equalTo", "value": 1 },
+        { "field": "title", "operator": "equalTo", "value": "Patched title" }
+      ],
+      "groups": ["regression", "jsonplaceholder"]
+    },
+    {
+      "testName": "deletePost",
+      "description": "Delete a post",
+      "endpoint": "DELETE /posts/{id}",
+      "pathParams": { "id": 1 },
+      "expectedStatusCode": 200,
+      "validations": [],
+      "groups": ["regression", "jsonplaceholder"]
+    }
+  ]
+}
